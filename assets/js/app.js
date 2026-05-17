@@ -1947,7 +1947,13 @@ function loadSignatureToCanvas(dataUrl, stamp) {
 
 ['btnNova'].forEach(id => document.getElementById(id).addEventListener('click', newOS));
 ['btnSalvar', 'btnSalvar2'].forEach(id => document.getElementById(id).addEventListener('click', saveOS));
-['btnImprimir', 'btnImprimir2'].forEach(id => document.getElementById(id).addEventListener('click', () => window.print()));
+['btnImprimir', 'btnImprimir2'].forEach(id => document.getElementById(id).addEventListener('click', () => {
+  syncSignatureFields();
+  const assinatura = document.getElementById('assinaturaCliente')?.value || '';
+  const dataHora = document.getElementById('assinaturaDataHora')?.value || '';
+  updateSignaturePreview(assinatura, dataHora);
+  setTimeout(() => window.print(), 120);
+}));
 document.getElementById('btnExcluir').addEventListener('click', deleteOS);
 document.getElementById('btnAplicarCliente').addEventListener('click', applyClientToOS);
 document.getElementById('btnSalvarCliente').addEventListener('click', saveClientFromOS);
