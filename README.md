@@ -18,3 +18,8 @@ Versão estática em HTML, CSS e JavaScript puro, pronta para GitHub Pages.
 - Impressão e salvamento em PDF pelo navegador.
 - Layout responsivo para PC e smartphone.
 - Padrão visual baseado nas cores da 013 Automação Comercial.
+
+
+## Base de clientes
+
+Esta versão já acompanha 126 clientes pré-cadastrados com Código/Loja, Nome, Razão Social e CNPJ. Novos clientes podem ser cadastrados diretamente pelo app e ficam salvos no navegador via localStorage.

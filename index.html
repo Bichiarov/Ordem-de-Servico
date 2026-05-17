@@ -32,6 +32,44 @@
         <label for="busca">Buscar OS</label>
         <input id="busca" type="search" placeholder="Cliente, loja, OS, status..." />
       </div>
+
+      <div class="clients-card">
+        <div class="clients-card__head">
+          <div>
+            <label for="clienteSelect">Clientes cadastrados</label>
+            <small>Selecione para preencher a OS</small>
+          </div>
+          <strong id="contadorClientes">0</strong>
+        </div>
+        <select id="clienteSelect">
+          <option value="">Selecionar cliente...</option>
+        </select>
+        <div class="client-actions">
+          <button type="button" class="btn-mini primary" id="btnAplicarCliente">Usar na OS</button>
+          <button type="button" class="btn-mini" id="btnSalvarCliente">Salvar cliente da OS</button>
+          <button type="button" class="btn-mini danger" id="btnExcluirCliente">Excluir cliente</button>
+        </div>
+        <details class="client-register">
+          <summary>Cadastrar cliente novo</summary>
+          <div class="client-form">
+            <input id="cadCodigo" placeholder="Código / Loja" />
+            <input id="cadCliente" placeholder="Nome fantasia" />
+            <input id="cadRazaoSocial" placeholder="Razão social" />
+            <input id="cadCnpj" placeholder="CNPJ" />
+            <input id="cadResponsavel" placeholder="Responsável" />
+            <input id="cadTelefone" placeholder="Telefone / WhatsApp" />
+            <input id="cadEmail" placeholder="E-mail" />
+            <input id="cadEndereco" placeholder="Endereço" />
+            <button type="button" class="btn btn-primary full" id="btnCadastrarCliente">Cadastrar cliente</button>
+          </div>
+        </details>
+        <details class="client-register">
+          <summary>Importar lista de clientes</summary>
+          <p class="hint">Use uma linha por cliente: Código; Nome; Razão Social; CNPJ; Responsável; Telefone; E-mail; Endereço</p>
+          <textarea id="importClientes" rows="5" placeholder="8596; Mercado Exemplo; Mercado Exemplo LTDA; 00000000000100; João; (13) 99999-9999; email@exemplo.com; Santos/SP"></textarea>
+          <button type="button" class="btn btn-dark full" id="btnImportarClientes">Importar clientes</button>
+        </details>
+      </div>
       <div class="list-title">
         <span>Histórico</span>
         <strong id="contadorOS">0</strong>
@@ -70,8 +108,10 @@
         <section class="block">
           <h3>Dados do Cliente</h3>
           <div class="grid grid-2">
-            <label>Cliente / Empresa <input name="cliente" id="cliente" required /></label>
-            <label>Loja <input name="loja" id="loja" /></label>
+            <label>Cliente / Nome Fantasia <input name="cliente" id="cliente" required /></label>
+            <label>Código / Loja <input name="loja" id="loja" /></label>
+            <label>Razão Social <input name="razaoSocial" id="razaoSocial" /></label>
+            <label>CNPJ <input name="cnpj" id="cnpj" /></label>
             <label>Responsável <input name="responsavel" id="responsavel" /></label>
             <label>Telefone / WhatsApp <input name="telefone" id="telefone" /></label>
             <label>E-mail <input name="email" id="email" type="email" /></label>
