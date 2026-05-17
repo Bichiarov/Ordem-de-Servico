@@ -2060,18 +2060,10 @@ async function sendOSPdfWhatsApp() {
     const numero = document.getElementById('numero')?.value || 'OS';
     const cliente = document.getElementById('cliente')?.value || 'cliente';
     const fileName = `${safeFileName(numero)}-${safeFileName(cliente)}.pdf`;
-    const file = new File([blob], fileName, { type: 'application/pdf' });
     const texto = `Segue a ordem de serviço ${numero} em PDF.`;
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        title: `Ordem de Serviço ${numero}`,
-        text: texto,
-        files: [file]
-      });
-      return;
-    }
-
+    // Evita a janela nativa de compartilhamento do Windows/Chrome que estava gerando erro.
+    // Em qualquer aparelho, o fluxo fica previsível: baixa o PDF idêntico ao impresso e abre o WhatsApp com a mensagem pronta.
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -2081,8 +2073,11 @@ async function sendOSPdfWhatsApp() {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
 
-    const msg = `${texto}\n\nO PDF foi baixado no seu dispositivo. Anexe o arquivo baixado nesta conversa do WhatsApp.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    const msg = `${texto}
+
+O PDF foi baixado no seu dispositivo. Anexe o arquivo ${fileName} nesta conversa do WhatsApp.`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    setTimeout(() => window.open(whatsappUrl, '_blank'), 450);
   } catch (error) {
     alert(error.message || 'Não foi possível gerar o PDF para envio.');
   }
