@@ -1945,6 +1945,103 @@ function loadSignatureToCanvas(dataUrl, stamp) {
   img.src = dataUrl;
 }
 
+
+function safeFileName(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9-_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || 'ordem-de-servico';
+}
+
+async function generateOSPdfBlob() {
+  syncSignatureFields();
+  const assinatura = document.getElementById('assinaturaCliente')?.value || '';
+  const dataHora = document.getElementById('assinaturaDataHora')?.value || '';
+  updateSignaturePreview(assinatura, dataHora);
+
+  if (!window.html2canvas || !window.jspdf) {
+    throw new Error('Bibliotecas de PDF não carregadas. Verifique sua conexão com a internet e tente novamente.');
+  }
+
+  const element = document.getElementById('formOS');
+  const previousTransform = element.style.transform;
+  const previousOrigin = element.style.transformOrigin;
+  const previousMargin = element.style.margin;
+
+  element.classList.add('pdf-capture');
+  element.style.transform = 'none';
+  element.style.transformOrigin = 'top left';
+  element.style.margin = '0 auto';
+
+  await new Promise(resolve => setTimeout(resolve, 180));
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    scrollX: 0,
+    scrollY: -window.scrollY,
+    windowWidth: element.scrollWidth,
+    windowHeight: element.scrollHeight
+  });
+
+  element.classList.remove('pdf-capture');
+  element.style.transform = previousTransform;
+  element.style.transformOrigin = previousOrigin;
+  element.style.margin = previousMargin;
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+  const imgWidth = canvas.width * ratio;
+  const imgHeight = canvas.height * ratio;
+  const x = (pageWidth - imgWidth) / 2;
+  const y = 0;
+  pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+  return pdf.output('blob');
+}
+
+async function sendOSPdfWhatsApp() {
+  try {
+    saveOS();
+    const blob = await generateOSPdfBlob();
+    const numero = document.getElementById('numero')?.value || 'OS';
+    const cliente = document.getElementById('cliente')?.value || 'cliente';
+    const fileName = `${safeFileName(numero)}-${safeFileName(cliente)}.pdf`;
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+    const texto = `Segue a ordem de serviço ${numero} em PDF.`;
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: `Ordem de Serviço ${numero}`,
+        text: texto,
+        files: [file]
+      });
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+    const msg = `${texto}\n\nO PDF foi baixado no seu dispositivo. Anexe o arquivo baixado nesta conversa do WhatsApp.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  } catch (error) {
+    alert(error.message || 'Não foi possível gerar o PDF para envio.');
+  }
+}
+
 ['btnNova'].forEach(id => document.getElementById(id).addEventListener('click', newOS));
 ['btnSalvar', 'btnSalvar2'].forEach(id => document.getElementById(id).addEventListener('click', saveOS));
 ['btnImprimir', 'btnImprimir2'].forEach(id => document.getElementById(id).addEventListener('click', () => {
@@ -1954,6 +2051,7 @@ function loadSignatureToCanvas(dataUrl, stamp) {
   updateSignaturePreview(assinatura, dataHora);
   setTimeout(() => window.print(), 120);
 }));
+['btnWhatsappPdf', 'btnWhatsappPdf2'].forEach(id => document.getElementById(id)?.addEventListener('click', sendOSPdfWhatsApp));
 document.getElementById('btnExcluir').addEventListener('click', deleteOS);
 document.getElementById('btnAplicarCliente').addEventListener('click', applyClientToOS);
 document.getElementById('btnSalvarCliente').addEventListener('click', saveClientFromOS);
