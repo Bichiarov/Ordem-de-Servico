@@ -407,7 +407,7 @@ textarea { resize: vertical; min-height: 84px; }
     flex-direction: column;
   }
   .layout { grid-template-columns: 1fr; }
-  .sidebar { order: 2; }
+  .sidebar { order: -1; padding-top: 12px; }
   .app-hero {
     min-height: auto;
     padding: 48px 20px 24px;
@@ -1325,4 +1325,73 @@ textarea { resize: vertical; min-height: 84px; }
     object-position: left center !important;
     margin: 2px 0 0 0 !important;
   }
+}
+
+/* Correção final: evitar letras cortadas/comidas nos campos da OS */
+@media screen, print {
+  .os-document input,
+  .os-document select,
+  .os-document textarea {
+    font-family: Arial, Helvetica, sans-serif !important;
+    line-height: 1.45 !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    overflow: visible !important;
+    text-rendering: geometricPrecision;
+  }
+
+  .service-table .td,
+  .block label,
+  .totals-card label {
+    overflow: visible !important;
+  }
+}
+
+@media print {
+  input,
+  select,
+  textarea {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 9.2px !important;
+    line-height: 1.45 !important;
+    padding: 2px 1px !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  textarea {
+    overflow: hidden !important;
+    white-space: pre-wrap !important;
+  }
+
+  .block label,
+  .doc-meta label,
+  .totals-card label {
+    line-height: 1.35 !important;
+    overflow: visible !important;
+  }
+
+  .td {
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+    overflow: visible !important;
+  }
+
+  #descricao { height: 40px !important; }
+  #diagnostico, #solucao { height: 47px !important; }
+  #observacoes { height: 50px !important; }
+
+  .assinatura-preview.has-signature {
+    display: block !important;
+    height: 38px !important;
+    max-height: 38px !important;
+  }
+}
+
+
+/* Ajuste mobile: painel de busca/clientes/histórico aparece no início da página */
+@media (max-width: 980px) {
+  .layout { display: grid !important; grid-template-columns: 1fr !important; }
+  .sidebar { order: -1 !important; padding-top: 12px !important; }
+  .workspace { order: 1 !important; }
 }
