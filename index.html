@@ -174,10 +174,36 @@
           </div>
         </section>
 
+        <input type="hidden" name="assinaturaCliente" id="assinaturaCliente" />
+        <input type="hidden" name="assinaturaDataHora" id="assinaturaDataHora" />
+
+        <section class="signature-digital no-print">
+          <div class="signature-digital__head">
+            <div>
+              <h3>Aceite e assinatura digital</h3>
+              <p>O cliente pode assinar diretamente na tela do smartphone, tablet ou computador.</p>
+            </div>
+            <label class="accept-check">
+              <input type="checkbox" name="aceiteCliente" id="aceiteCliente" value="sim" />
+              <span>Cliente confirma o atendimento descrito nesta OS.</span>
+            </label>
+          </div>
+          <div class="signature-pad-wrap">
+            <canvas id="assinaturaCanvas" width="900" height="220" aria-label="Campo para assinatura digital"></canvas>
+            <span class="signature-placeholder">Assine aqui</span>
+          </div>
+          <div class="signature-actions">
+            <button type="button" class="btn btn-light" id="btnLimparAssinatura">Limpar assinatura</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmarAssinatura">Confirmar assinatura</button>
+            <span id="assinaturaStatus">Nenhuma assinatura confirmada.</span>
+          </div>
+        </section>
+
         <section class="signatures">
           <div>
             <strong>Assinatura do Cliente</strong>
-            <span>Nome e assinatura</span>
+            <img id="assinaturaPreviewPrint" class="assinatura-preview" alt="Assinatura digital do cliente" />
+            <span id="assinaturaInfoPrint">Nome e assinatura</span>
           </div>
           <div>
             <strong>Assinatura do Técnico</strong>

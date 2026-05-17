@@ -1525,6 +1525,9 @@ const moneyFields = ['valorServico', 'valorPecas', 'desconto'];
 let ordens = [];
 let clientes = [];
 let selectedNumero = null;
+let signaturePad = null;
+let isDrawingSignature = false;
+let hasSignatureStroke = false;
 
 const exemplo = {
   numero: 'OS-' + new Date().getFullYear() + '-0001',
@@ -1547,7 +1550,10 @@ const exemplo = {
   observacoes: '',
   valorServico: '0,00',
   valorPecas: '0,00',
-  desconto: '0,00'
+  desconto: '0,00',
+  assinaturaCliente: '',
+  assinaturaDataHora: '',
+  aceiteCliente: ''
 };
 
 function moneyToNumber(value) {
@@ -1568,7 +1574,10 @@ function setFormData(os) {
     const field = document.getElementById(key);
     if (field) field.value = value ?? '';
   });
+  const aceite = document.getElementById('aceiteCliente');
+  if (aceite) aceite.checked = os.aceiteCliente === 'sim';
   selectedNumero = os.numero || null;
+  loadSignatureToCanvas(os.assinaturaCliente || '', os.assinaturaDataHora || '');
   updateTotals();
   renderList();
 }
@@ -1745,7 +1754,9 @@ function newOS() {
   renderList();
 }
 function saveOS() {
+  syncSignatureFields();
   const os = getFormData();
+  os.aceiteCliente = document.getElementById('aceiteCliente')?.checked ? 'sim' : '';
   if (!os.cliente.trim()) { alert('Informe o cliente antes de salvar a ordem de serviço.'); document.getElementById('cliente').focus(); return; }
   const idx = ordens.findIndex(item => item.numero === (selectedNumero || os.numero));
   if (idx >= 0) ordens[idx] = os; else ordens.push(os);
@@ -1801,6 +1812,139 @@ function escapeHtml(value) {
   return String(value || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 }
 
+function setupSignaturePad() {
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (!canvas) return;
+  signaturePad = canvas;
+  resizeSignatureCanvas(false);
+  window.addEventListener('resize', () => resizeSignatureCanvas(true));
+
+  function getPoint(event) {
+    const rect = canvas.getBoundingClientRect();
+    const source = event.touches ? event.touches[0] : event;
+    return {
+      x: (source.clientX - rect.left) * (canvas.width / rect.width),
+      y: (source.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+  function start(event) {
+    event.preventDefault();
+    isDrawingSignature = true;
+    hasSignatureStroke = true;
+    canvas.parentElement.classList.add('has-signature');
+    const ctx = canvas.getContext('2d');
+    const p = getPoint(event);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  }
+  function move(event) {
+    if (!isDrawingSignature) return;
+    event.preventDefault();
+    const ctx = canvas.getContext('2d');
+    const p = getPoint(event);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  }
+  function end(event) {
+    if (!isDrawingSignature) return;
+    event.preventDefault();
+    isDrawingSignature = false;
+  }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end, { passive: false });
+}
+function resizeSignatureCanvas(keepImage) {
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (!canvas) return;
+  const previous = keepImage && hasSignatureStroke ? canvas.toDataURL('image/png') : '';
+  const ratio = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(600, Math.floor(rect.width * ratio));
+  canvas.height = Math.max(160, Math.floor(rect.height * ratio));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = '#111111';
+  ctx.lineWidth = Math.max(2.2 * ratio, 2);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  if (previous) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    img.src = previous;
+  }
+}
+function clearSignature() {
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (!canvas) return;
+  hasSignatureStroke = false;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  canvas.parentElement.classList.remove('has-signature');
+  document.getElementById('assinaturaCliente').value = '';
+  document.getElementById('assinaturaDataHora').value = '';
+  updateSignaturePreview('', '');
+}
+function confirmSignature() {
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (!canvas || !hasSignatureStroke) { alert('Peça para o cliente assinar no quadro antes de confirmar.'); return; }
+  const dataUrl = canvas.toDataURL('image/png');
+  const stamp = new Date().toLocaleString('pt-BR');
+  document.getElementById('assinaturaCliente').value = dataUrl;
+  document.getElementById('assinaturaDataHora').value = stamp;
+  document.getElementById('aceiteCliente').checked = true;
+  updateSignaturePreview(dataUrl, stamp);
+  alert('Assinatura digital confirmada. Agora salve a OS.' );
+}
+function syncSignatureFields() {
+  const hidden = document.getElementById('assinaturaCliente');
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (canvas && hasSignatureStroke && hidden && !hidden.value) {
+    hidden.value = canvas.toDataURL('image/png');
+    document.getElementById('assinaturaDataHora').value = new Date().toLocaleString('pt-BR');
+  }
+}
+function updateSignaturePreview(dataUrl, stamp) {
+  const img = document.getElementById('assinaturaPreviewPrint');
+  const info = document.getElementById('assinaturaInfoPrint');
+  const status = document.getElementById('assinaturaStatus');
+  if (img) {
+    if (dataUrl) {
+      img.src = dataUrl;
+      img.classList.add('has-signature');
+    } else {
+      img.removeAttribute('src');
+      img.classList.remove('has-signature');
+    }
+  }
+  if (info) info.textContent = dataUrl ? `Assinado digitalmente em ${stamp}` : 'Nome e assinatura';
+  if (status) status.textContent = dataUrl ? `Assinatura confirmada em ${stamp}.` : 'Nenhuma assinatura confirmada.';
+}
+function loadSignatureToCanvas(dataUrl, stamp) {
+  const canvas = document.getElementById('assinaturaCanvas');
+  if (!canvas) return;
+  clearSignature();
+  if (!dataUrl) return;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    hasSignatureStroke = true;
+    canvas.parentElement.classList.add('has-signature');
+    document.getElementById('assinaturaCliente').value = dataUrl;
+    document.getElementById('assinaturaDataHora').value = stamp || '';
+    updateSignaturePreview(dataUrl, stamp || '');
+  };
+  img.src = dataUrl;
+}
+
 ['btnNova'].forEach(id => document.getElementById(id).addEventListener('click', newOS));
 ['btnSalvar', 'btnSalvar2'].forEach(id => document.getElementById(id).addEventListener('click', saveOS));
 ['btnImprimir', 'btnImprimir2'].forEach(id => document.getElementById(id).addEventListener('click', () => window.print()));
@@ -1818,9 +1962,12 @@ moneyFields.forEach(id => {
   field.addEventListener('input', updateTotals);
 });
 form.addEventListener('input', updateTotals);
+document.getElementById('btnLimparAssinatura')?.addEventListener('click', clearSignature);
+document.getElementById('btnConfirmarAssinatura')?.addEventListener('click', confirmSignature);
 const labels = ['Serviço', 'Problema relatado', 'Técnico'];
 document.querySelectorAll('.service-table .td').forEach((td, idx) => td.setAttribute('data-label', labels[idx]));
 
+setupSignaturePad();
 loadLocal();
 loadClientsLocal();
 renderClients();

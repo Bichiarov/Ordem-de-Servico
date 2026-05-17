@@ -446,6 +446,99 @@ textarea { resize: vertical; min-height: 84px; }
   .app-toolbar__actions .btn { width: 100%; }
 }
 
+
+.signature-digital {
+  margin-top: 16px;
+  border: 1px solid #d9dfe5;
+  border-radius: 18px;
+  padding: 16px;
+  background: #fff;
+}
+.signature-digital__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.signature-digital h3 {
+  margin: 0 0 4px;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: 14px;
+  border-left: 6px solid var(--azul-013);
+  padding-left: 10px;
+}
+.signature-digital p {
+  margin: 0;
+  color: var(--cinza);
+  font-size: 13px;
+}
+.accept-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 340px;
+  color: #111;
+  font-size: 13px;
+  font-weight: 800;
+}
+.accept-check input { width: 18px; height: 18px; }
+.signature-pad-wrap {
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed #c8d0d8;
+  border-radius: 16px;
+  background: #fff;
+  min-height: 150px;
+}
+#assinaturaCanvas {
+  display: block;
+  width: 100%;
+  height: 170px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.signature-placeholder {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(0,0,0,.22);
+  font-size: 28px;
+  font-weight: 900;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.signature-pad-wrap.has-signature .signature-placeholder { display: none; }
+.signature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.signature-actions span {
+  color: var(--cinza);
+  font-size: 13px;
+  font-weight: 700;
+}
+.assinatura-preview {
+  display: none;
+  width: 100%;
+  max-height: 54px;
+  object-fit: contain;
+  object-position: left center;
+  margin: 6px 0;
+}
+.assinatura-preview.has-signature { display: block; }
+@media (max-width: 700px) {
+  .signature-digital__head { flex-direction: column; }
+  .accept-check { max-width: none; }
+  #assinaturaCanvas { height: 190px; }
+}
+
 @media print {
   @page { size: A4; margin: 0; }
   html, body {
@@ -567,6 +660,13 @@ textarea { resize: vertical; min-height: 84px; }
   .signatures span {
     padding-top: 6px;
     font-size: 10px;
+  }
+
+  .signature-digital { display: none !important; }
+  .assinatura-preview.has-signature {
+    display: block !important;
+    max-height: 42px;
+    margin: 3px 0;
   }
   .doc-footer {
     position: relative;
