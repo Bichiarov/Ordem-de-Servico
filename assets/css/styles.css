@@ -1439,3 +1439,155 @@ textarea { resize: vertical; min-height: 84px; }
     width: 100%;
   }
 }
+
+
+/* Geração de PDF idêntica à via impressa */
+.pdf-capture-wrapper {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  width: 210mm;
+  overflow: visible;
+}
+.pdf-capture {
+  width: 210mm !important;
+  min-height: 297mm !important;
+  max-width: 210mm !important;
+  background: #fff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  position: relative !important;
+  padding: 13mm 11mm 10mm 11mm !important;
+}
+.pdf-capture .no-print,
+.pdf-capture .signature-digital {
+  display: none !important;
+}
+.pdf-capture .doc-bg {
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 210mm !important;
+  height: 297mm !important;
+  z-index: 0 !important;
+}
+.pdf-capture .doc-bg img {
+  display: block !important;
+  width: 210mm !important;
+  height: 297mm !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+}
+.pdf-capture > :not(.doc-bg) {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.pdf-capture .doc-header {
+  padding-top: 11mm !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 10px !important;
+  gap: 12px !important;
+}
+.pdf-capture .doc-brand {
+  grid-template-columns: minmax(160px, 190px) minmax(0, 1fr) !important;
+  gap: 12px !important;
+}
+.pdf-capture .doc-logo-box {
+  max-width: 190px !important;
+  min-height: 60px !important;
+  padding: 6px 10px !important;
+  background: linear-gradient(180deg, #121417 0%, #060708 100%) !important;
+  border-radius: 14px !important;
+}
+.pdf-capture .doc-brand img { width: 100% !important; max-width: 170px !important; }
+.pdf-capture .doc-company { font-size: 10px !important; }
+.pdf-capture .doc-brand h2 { font-size: 27px !important; margin: 2px 0 !important; }
+.pdf-capture .doc-subtitle { font-size: 10px !important; }
+.pdf-capture .doc-meta {
+  min-width: 215px !important;
+  padding: 9px !important;
+  gap: 6px !important;
+  border-radius: 14px !important;
+}
+.pdf-capture .block,
+.pdf-capture .totals-card {
+  background: rgba(255,255,255,.93) !important;
+  break-inside: avoid !important;
+  margin-top: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+}
+.pdf-capture .block h3,
+.pdf-capture .totals-card h3 {
+  margin: 0 0 8px !important;
+  font-size: 11px !important;
+  letter-spacing: .12em !important;
+}
+.pdf-capture .grid,
+.pdf-capture .lower-grid,
+.pdf-capture .grid-2 { gap: 10px !important; }
+.pdf-capture .service-table {
+  grid-template-columns: 1fr 1.8fr .85fr !important;
+  border-radius: 12px !important;
+}
+.pdf-capture .th { padding: 8px 10px !important; font-size: 11px !important; }
+.pdf-capture .td { padding: 8px !important; }
+.pdf-capture .lower-grid {
+  grid-template-columns: minmax(0, 1fr) 240px !important;
+  margin-top: 10px !important;
+}
+.pdf-capture .signatures { gap: 10px !important; margin-top: 10px !important; }
+.pdf-capture .signatures div {
+  min-height: 74px !important;
+  padding: 10px !important;
+  border-radius: 12px !important;
+}
+.pdf-capture .signatures strong { font-size: 11px !important; }
+.pdf-capture .signatures span {
+  padding-top: 6px !important;
+  font-size: 10px !important;
+}
+.pdf-capture .assinatura-preview.has-signature {
+  display: block !important;
+  height: 38px !important;
+  max-height: 38px !important;
+}
+.pdf-capture .doc-footer {
+  position: relative !important;
+  margin-top: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+}
+.pdf-capture .doc-footer span { font-size: 10px !important; margin-top: 3px !important; }
+.pdf-capture input,
+.pdf-capture select,
+.pdf-capture textarea {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 9.2px !important;
+  line-height: 1.45 !important;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 2px 1px !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  color: #111 !important;
+}
+.pdf-capture textarea {
+  overflow: hidden !important;
+  white-space: pre-wrap !important;
+  resize: none !important;
+}
+.pdf-capture .block label,
+.pdf-capture .doc-meta label,
+.pdf-capture .totals-card label {
+  line-height: 1.35 !important;
+  overflow: visible !important;
+  font-size: 11px !important;
+  gap: 3px !important;
+}
+.pdf-capture #descricao { height: 40px !important; }
+.pdf-capture #diagnostico,
+.pdf-capture #solucao { height: 47px !important; }
+.pdf-capture #observacoes { height: 50px !important; }

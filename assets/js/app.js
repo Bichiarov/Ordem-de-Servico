@@ -1955,6 +1955,55 @@ function safeFileName(value) {
     .replace(/^-|-$/g, '') || 'ordem-de-servico';
 }
 
+function createPrintablePdfClone() {
+  const source = document.getElementById('formOS');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'pdf-capture-wrapper';
+  wrapper.style.position = 'fixed';
+  wrapper.style.left = '-99999px';
+  wrapper.style.top = '0';
+  wrapper.style.width = '210mm';
+  wrapper.style.height = 'auto';
+  wrapper.style.opacity = '1';
+  wrapper.style.pointerEvents = 'none';
+  wrapper.style.zIndex = '-1';
+
+  const clone = source.cloneNode(true);
+  clone.id = 'formOSPdfClone';
+  clone.classList.add('pdf-capture');
+
+  const sourceFields = source.querySelectorAll('input, select, textarea');
+  const cloneFields = clone.querySelectorAll('input, select, textarea');
+  sourceFields.forEach((field, index) => {
+    const target = cloneFields[index];
+    if (!target) return;
+    if (field.type === 'checkbox' || field.type === 'radio') {
+      target.checked = field.checked;
+    } else {
+      target.value = field.value;
+    }
+  });
+
+  const assinatura = document.getElementById('assinaturaCliente')?.value || '';
+  const dataHora = document.getElementById('assinaturaDataHora')?.value || '';
+  const preview = clone.querySelector('#assinaturaPreviewPrint');
+  const info = clone.querySelector('#assinaturaInfoPrint');
+  if (preview) {
+    if (assinatura) {
+      preview.src = assinatura;
+      preview.classList.add('has-signature');
+    } else {
+      preview.removeAttribute('src');
+      preview.classList.remove('has-signature');
+    }
+  }
+  if (info) info.textContent = assinatura ? `Assinado digitalmente em ${dataHora}` : 'Nome e assinatura';
+
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  return { wrapper, clone };
+}
+
 async function generateOSPdfBlob() {
   syncSignatureFields();
   const assinatura = document.getElementById('assinaturaCliente')?.value || '';
@@ -1965,46 +2014,36 @@ async function generateOSPdfBlob() {
     throw new Error('Bibliotecas de PDF não carregadas. Verifique sua conexão com a internet e tente novamente.');
   }
 
-  const element = document.getElementById('formOS');
-  const previousTransform = element.style.transform;
-  const previousOrigin = element.style.transformOrigin;
-  const previousMargin = element.style.margin;
+  const { wrapper, clone } = createPrintablePdfClone();
+  await new Promise(resolve => setTimeout(resolve, 220));
 
-  element.classList.add('pdf-capture');
-  element.style.transform = 'none';
-  element.style.transformOrigin = 'top left';
-  element.style.margin = '0 auto';
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: clone.scrollWidth,
+      windowHeight: clone.scrollHeight
+    });
 
-  await new Promise(resolve => setTimeout(resolve, 180));
-
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    scrollX: 0,
-    scrollY: -window.scrollY,
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight
-  });
-
-  element.classList.remove('pdf-capture');
-  element.style.transform = previousTransform;
-  element.style.transformOrigin = previousOrigin;
-  element.style.margin = previousMargin;
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pageWidth = 210;
-  const pageHeight = 297;
-  const imgData = canvas.toDataURL('image/jpeg', 0.95);
-  const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-  const imgWidth = canvas.width * ratio;
-  const imgHeight = canvas.height * ratio;
-  const x = (pageWidth - imgWidth) / 2;
-  const y = 0;
-  pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-  return pdf.output('blob');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const imgData = canvas.toDataURL('JPEG', 0.98);
+    const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+    const x = (pageWidth - imgWidth) / 2;
+    const y = (pageHeight - imgHeight) / 2;
+    pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+    return pdf.output('blob');
+  } finally {
+    wrapper.remove();
+  }
 }
 
 async function sendOSPdfWhatsApp() {
