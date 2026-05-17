@@ -2004,6 +2004,18 @@ function createPrintablePdfClone() {
   return { wrapper, clone };
 }
 
+function waitForCloneAssets(clone) {
+  const images = Array.from(clone.querySelectorAll('img'));
+  const imagePromises = images.map(img => {
+    if (img.complete && img.naturalWidth !== 0) return Promise.resolve();
+    return new Promise(resolve => {
+      img.onload = resolve;
+      img.onerror = resolve;
+    });
+  });
+  return Promise.all(imagePromises).then(() => new Promise(resolve => setTimeout(resolve, 250)));
+}
+
 async function generateOSPdfBlob() {
   syncSignatureFields();
   const assinatura = document.getElementById('assinaturaCliente')?.value || '';
@@ -2015,11 +2027,11 @@ async function generateOSPdfBlob() {
   }
 
   const { wrapper, clone } = createPrintablePdfClone();
-  await new Promise(resolve => setTimeout(resolve, 220));
+  await waitForCloneAssets(clone);
 
   try {
     const canvas = await html2canvas(clone, {
-      scale: 2,
+      scale: 2.5,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
@@ -2030,16 +2042,11 @@ async function generateOSPdfBlob() {
     });
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
     const pageWidth = 210;
     const pageHeight = 297;
-    const imgData = canvas.toDataURL('JPEG', 0.98);
-    const ratio = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-    const imgWidth = canvas.width * ratio;
-    const imgHeight = canvas.height * ratio;
-    const x = (pageWidth - imgWidth) / 2;
-    const y = (pageHeight - imgHeight) / 2;
-    pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
     return pdf.output('blob');
   } finally {
     wrapper.remove();
