@@ -1818,7 +1818,7 @@ moneyFields.forEach(id => {
   field.addEventListener('input', updateTotals);
 });
 form.addEventListener('input', updateTotals);
-const labels = ['Serviço', 'Equipamento / Sistema', 'Problema relatado', 'Técnico'];
+const labels = ['Serviço', 'Problema relatado', 'Técnico'];
 document.querySelectorAll('.service-table .td').forEach((td, idx) => td.setAttribute('data-label', labels[idx]));
 
 loadLocal();

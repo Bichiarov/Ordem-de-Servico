@@ -1,4 +1,4 @@
-# App Ordem de Serviço - 013 Automação Comercial
+# App Ordem de Serviço - Zero Treze Automação Comercial
 
 Versão estática em HTML, CSS e JavaScript puro, pronta para GitHub Pages.
 
@@ -17,7 +17,7 @@ Versão estática em HTML, CSS e JavaScript puro, pronta para GitHub Pages.
 - Busca por OS, cliente, loja, status, técnico ou serviço.
 - Impressão e salvamento em PDF pelo navegador.
 - Layout responsivo para PC e smartphone.
-- Padrão visual baseado nas cores da 013 Automação Comercial.
+- Padrão visual baseado nas cores da Zero Treze Automação Comercial.
 
 
 ## Base de clientes
