@@ -1,32 +1,19 @@
-# App de Ordem de Serviço - 013 Automação Comercial
+# App Ordem de Serviço - 013 Automação Comercial
 
-Aplicativo web em React/Vite para emissão e controle de Ordens de Serviço da 013 Automação Comercial.
+Versão estática em HTML, CSS e JavaScript puro.
 
-## Recursos
+## Como publicar no GitHub Pages
 
-- Cadastro de nova OS
-- Numeração automática
-- Data automática
-- Dados do cliente e loja
-- Descrição do atendimento
-- Diagnóstico e solução
-- Status da OS
-- Valores, desconto, subtotal e total
-- Assinaturas
-- Impressão em formato comercial
-- Layout responsivo para PC e smartphone
+1. Extraia o ZIP.
+2. Envie todos os arquivos para o repositório.
+3. No GitHub, acesse Settings > Pages.
+4. Em Branch, selecione `main` e `/root`.
+5. Salve e aguarde o link ser gerado.
 
-## Como rodar localmente
+## Como abrir localmente
 
-```bash
-npm install
-npm run dev
-```
+Abra o arquivo `index.html` no navegador.
 
-## Como gerar versão de produção
+## Observação
 
-```bash
-npm run build
-```
-
-Depois, publique a pasta `dist` no serviço de hospedagem desejado, como Netlify, Vercel ou GitHub Pages.
+As ordens de serviço são salvas no navegador usando `localStorage`.

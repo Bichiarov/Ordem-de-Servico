@@ -1,13 +1,166 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#020617" />
-    <title>Ordem de Serviço | 013 Automação Comercial</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ordem de Serviço - 013 Automação Comercial</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="topbar no-print">
+    <div class="topbar-inner">
+      <div>
+        <p class="eyebrow">013 Automação Comercial</p>
+        <h1>Sistema de Ordem de Serviço</h1>
+        <p class="subtitle">Atendimento técnico, suporte, implantação e automação comercial.</p>
+      </div>
+      <div class="actions">
+        <button id="btnNova" class="btn light">+ Nova OS</button>
+        <button id="btnSalvar" class="btn primary">Salvar</button>
+        <button id="btnImprimir" class="btn outline">Imprimir / PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar no-print">
+      <div class="search-card">
+        <input id="busca" type="search" placeholder="Buscar por OS, cliente, loja ou status..." />
+      </div>
+      <div id="listaOS" class="os-list"></div>
+    </aside>
+
+    <section class="document-card" id="areaImpressao">
+      <div class="doc-header">
+        <div class="brand-block">
+          <div class="logo-box"><span class="logo-blue">ZER</span>O13</div>
+          <div>
+            <p class="doc-company">013 Automação Comercial</p>
+            <h2>Ordem de Serviço</h2>
+            <p class="doc-subtitle">Suporte técnico • Automação comercial • PDV Legal</p>
+          </div>
+        </div>
+        <div class="doc-meta">
+          <div><span>OS</span><strong id="metaNumero">OS-2026-0001</strong></div>
+          <div><span>Data</span><strong id="metaData">17/05/2026</strong></div>
+          <div><span>Status</span><strong id="metaStatus" class="status-pill aberta">Aberta</strong></div>
+        </div>
+      </div>
+
+      <form id="formOS" class="doc-body">
+        <div class="edit-grid no-print">
+          <label>Número da OS<input id="numero" /></label>
+          <label>Data<input id="data" type="date" /></label>
+          <label>Loja<input id="loja" /></label>
+          <label>Status
+            <select id="status">
+              <option>Aberta</option>
+              <option>Em andamento</option>
+              <option>Aguardando cliente</option>
+              <option>Concluída</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="block">
+          <h3>Dados do Cliente</h3>
+          <div class="info-grid">
+            <label><span>Cliente:</span><input id="cliente" /></label>
+            <label><span>Loja:</span><input id="lojaInfo" /></label>
+            <label><span>Responsável:</span><input id="responsavel" /></label>
+            <label><span>Telefone:</span><input id="telefone" /></label>
+            <label><span>E-mail:</span><input id="email" /></label>
+            <label><span>Endereço:</span><input id="endereco" /></label>
+          </div>
+        </section>
+
+        <section class="block">
+          <h3>Descrição do Atendimento</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Serviço</th>
+                  <th>Equipamento / Sistema</th>
+                  <th>Problema relatado</th>
+                  <th>Técnico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select id="servico">
+                      <option>Instalação PDV Legal</option>
+                      <option>Suporte remoto</option>
+                      <option selected>Suporte presencial</option>
+                      <option>Configuração de impressora</option>
+                      <option>Configuração de rede</option>
+                      <option>Instalação de sistema</option>
+                      <option>Treinamento operacional</option>
+                      <option>Manutenção preventiva</option>
+                    </select>
+                  </td>
+                  <td><input id="equipamento" placeholder="Ex: computador caixa / PDV" /></td>
+                  <td><textarea id="descricao" rows="3" placeholder="Descreva o problema informado pelo cliente"></textarea></td>
+                  <td><input id="tecnico" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="block">
+          <h3>Diagnóstico e Solução</h3>
+          <div class="two-cols">
+            <label>Diagnóstico técnico<textarea id="diagnostico" rows="4"></textarea></label>
+            <label>Solução aplicada<textarea id="solucao" rows="4"></textarea></label>
+          </div>
+        </section>
+
+        <div class="bottom-grid">
+          <section class="block">
+            <h3>Observações</h3>
+            <textarea id="observacoes" rows="5"></textarea>
+          </section>
+
+          <section class="values-box">
+            <h3>Valores</h3>
+            <label><span>Serviço</span><input id="valorServico" /></label>
+            <label><span>Peças</span><input id="valorPecas" /></label>
+            <label><span>Desconto</span><input id="desconto" /></label>
+            <div class="subtotal"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+            <div class="total-box">
+              <span>Total</span>
+              <strong id="total">R$ 0,00</strong>
+            </div>
+          </section>
+        </div>
+
+        <div class="signature-grid">
+          <div>
+            <strong>Assinatura do Cliente</strong>
+            <span>Nome e assinatura</span>
+          </div>
+          <div>
+            <strong>Assinatura do Técnico</strong>
+            <span>013 Automação Comercial</span>
+          </div>
+        </div>
+
+        <footer class="doc-footer">
+          <strong>013 Automação Comercial</strong>
+          <span>suporte@013automacao.com.br • comercial@013automacao.com.br • www.013automacao.com.br</span>
+        </footer>
+      </form>
+
+      <div class="mobile-actions no-print">
+        <button id="btnExcluir" class="btn danger">Excluir</button>
+        <button id="btnSalvar2" class="btn primary">Salvar OS</button>
+        <button id="btnImprimir2" class="btn dark">Imprimir</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/main.js"></script>
+</body>
 </html>
